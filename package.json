@@ -18,5 +18,10 @@
   "license": "Unlicense",
   "bugs": {
     "url": "https://github.com/bluedroplet/elastic-ethereum/issues"
+  },
+  "dependencies": {
+    "config": "^1.16.0",
+    "elasticsearch": "^9.0.0",
+    "web3": "^0.15.1"
   }
 }
