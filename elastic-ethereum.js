@@ -16,31 +16,18 @@ var lastBlockNumber = -1;
 var lastLogIndex;
 
 // Get last log processed.
-client.search({
+client.get({
   index: index,
-  type: 'mytype',
+  type: 'elastic-ethereum',
+  id: 0
+}, function (error, response) {
+  if (!error) {
+    lastBlockNumber = response._source.lastBlockNumber;
+    lastLogIndex = response._source.lastLogIndex;
+  }
 
-  body: {
-    "query": {
-      "match_all": {}
-    },
-    "size": 1,
-    "sort": [
-      {
-        "_timestamp": {
-          "order": "desc"
-        }
-      }
-    ]
-  }
-}, function (err, response) {
-  if (!err) {
-    lastBlockNumber = response.hits.hits[0]._source.blockNumber;
-    lastLogIndex = response.hits.hits[0]._source.logIndex;
-  }
   watch();
 });
-
 
 function watch() {
   var filter = web3.eth.filter({fromBlock: lastBlockNumber, toBlock: 'latest', address: config.get('ethereum.contract_address')});
@@ -71,21 +58,29 @@ function watch() {
     var documents = getDocumentsFromLog(result);
     for (type in documents) {
       for (id in documents[type]) {
-
-        var body = documents[type][id];
-        body.blockNumber = result.blockNumber;
-        body.logIndex = result.logIndex;
-
         client.index({
           index: index,
           type: type,
           id: id,
-          body: body
+          body: documents[type][id]
         }, function (error, response) {
           console.log(response);
         });
       }
     }
+
+    client.index({
+      index: index,
+      type: 'elastic-ethereum',
+      id: 0,
+      body: {
+        lastBlockNumber: result.blockNumber,
+        lastLogIndex: result.logIndex
+      }
+    }, function (error, response) {
+      console.log(response);
+    });
+
   });
 }
 
