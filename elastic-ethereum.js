@@ -18,7 +18,7 @@ var client = new elasticsearch.Client({
 var callbacks = require('./config/' + process.env.NODE_ENV + '.callbacks.js');
 callbacks.onInit();
 
-var lastBlockNumber = -1;
+var lastBlockNumber;
 var lastLogIndex;
 
 // Get last log processed.
@@ -32,6 +32,7 @@ client.get({
     lastLogIndex = response._source.lastLogIndex;
   }
   else {
+    lastBlockNumber = 0;
     callbacks.onCreate();
   }
 
