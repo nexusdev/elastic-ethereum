@@ -1,8 +1,7 @@
 {
   "ethereum": {
     "provider": "http://localhost:8545",
-    "contract_address": "0x",
-    "contract_abi": ""
+    "contract_address": "0x"
   },
   "elasticsearch": {
     "host": "localhost:9200",

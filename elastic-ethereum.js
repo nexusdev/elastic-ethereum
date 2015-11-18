@@ -7,7 +7,8 @@ var index = config.get('elasticsearch.index');
 
 web3.setProvider(new web3.providers.HttpProvider(config.get('ethereum.provider')));
 
-var abi = require('./config/' + config.get('ethereum.contract_abi'));
+
+var abi = require('./config/' + process.env.NODE_ENV + '.abi.json');
 var contract = web3.eth.contract(abi);
 
 var client = new elasticsearch.Client({
