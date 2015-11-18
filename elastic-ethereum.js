@@ -15,6 +15,9 @@ var client = new elasticsearch.Client({
   host: config.get('elasticsearch.host')
 });
 
+var callbacks = require('./config/' + process.env.NODE_ENV + '.callbacks.js');
+callbacks.onInit();
+
 var lastBlockNumber = -1;
 var lastLogIndex;
 
@@ -27,6 +30,9 @@ client.get({
   if (!error) {
     lastBlockNumber = response._source.lastBlockNumber;
     lastLogIndex = response._source.lastLogIndex;
+  }
+  else {
+    callbacks.onCreate();
   }
 
   watch();
@@ -44,7 +50,7 @@ function watch() {
     console.log(result.blockNumber + ':' + result.logIndex);
 
     // Delete documents.
-    var deletes = getDeletesFromLog(result);
+    var deletes = callbacks.getDeletes(result);
     for (type in deletes) {
       for (id in deletes[type]) {
         client.delete({
@@ -58,7 +64,7 @@ function watch() {
     }
 
     // Index documents.
-    var documents = getDocumentsFromLog(result);
+    var documents = callbacks.getDocuments(result);
     for (type in documents) {
       for (id in documents[type]) {
         client.index({
@@ -85,26 +91,4 @@ function watch() {
     });
 
   });
-}
-
-
-function getDeletesFromLog(log) {
-
-  return {
-    mytype: [1]
-  }
-}
-
-
-function getDocumentsFromLog(log) {
-
-  return {
-    mytype: {
-      1: {
-        title: "hello",
-        tags: ['y', 'z'],
-        published: true
-      }
-    }
-  }
 }
