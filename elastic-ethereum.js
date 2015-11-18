@@ -1,17 +1,17 @@
 var Web3 = require('web3');
-var web3 = new Web3();
+web3 = new Web3();
 var elasticsearch = require('elasticsearch');
 var config = require('config');
 
-var index = config.get('elasticsearch.index');
+index = config.get('elasticsearch.index');
 
 web3.setProvider(new web3.providers.HttpProvider(config.get('ethereum.provider')));
 
 
 var abi = require('./config/' + process.env.NODE_ENV + '.abi.json');
-var contract = web3.eth.contract(abi);
+contract = web3.eth.contract(abi);
 
-var client = new elasticsearch.Client({
+client = new elasticsearch.Client({
   host: config.get('elasticsearch.host')
 });
 
