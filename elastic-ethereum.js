@@ -7,10 +7,12 @@ var index = config.get('elasticsearch.index');
 
 web3.setProvider(new web3.providers.HttpProvider(config.get('ethereum.provider')));
 
+var abi = require('./config/' + config.get('ethereum.contract_abi'));
+var contract = web3.eth.contract(abi);
+
 var client = new elasticsearch.Client({
   host: config.get('elasticsearch.host')
 });
-
 
 var lastBlockNumber = -1;
 var lastLogIndex;
