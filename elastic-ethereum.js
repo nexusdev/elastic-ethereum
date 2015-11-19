@@ -3,6 +3,14 @@ web3 = new Web3();
 var elasticsearch = require('elasticsearch');
 var config = require('config');
 
+var commandLineArgs = require('command-line-args');
+
+var cli = commandLineArgs([
+  { name: 'reindex', alias: 'r', type: Boolean }
+]);
+
+var options = cli.parse();
+
 index = config.get('elasticsearch.index');
 
 web3.setProvider(new web3.providers.HttpProvider(config.get('ethereum.provider')));
@@ -21,25 +29,38 @@ callbacks.onInit();
 var lastBlockNumber;
 var lastLogIndex;
 
-// Get last log processed.
-client.get({
-  index: index,
-  type: 'elastic-ethereum',
-  id: 0
-}, function (error, response) {
-  if (!error) {
-    lastBlockNumber = response._source.lastBlockNumber;
-    lastLogIndex = response._source.lastLogIndex;
-  }
-  else {
-    lastBlockNumber = 0;
-    callbacks.onCreate();
-  }
+if (options.reindex) {
+  client.indices.delete({index: index}).then(function() {
+      step1();
+  }, function() {
+      console.log("error");
+  });
+}
+else {
+  step1();
+}
 
-  watch();
-});
+function step1() {
+  // Get last log processed.
+  client.get({
+    index: index,
+    type: 'elastic-ethereum',
+    id: 0
+  }, function (error, response) {
+    if (!error) {
+      lastBlockNumber = response._source.lastBlockNumber;
+      lastLogIndex = response._source.lastLogIndex;
+    }
+    else {
+      lastBlockNumber = 0;
+      callbacks.onCreate();
+    }
 
-function watch() {
+    step2();
+  });
+}
+
+function step2() {
   var filter = web3.eth.filter({fromBlock: lastBlockNumber, toBlock: 'latest', address: config.get('ethereum.contract_address')});
 
   filter.watch(function(error, result) {
