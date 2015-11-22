@@ -29,6 +29,9 @@ callbacks.onInit();
 var lastBlockNumber;
 var lastLogIndex;
 
+var queue = [];
+var processing = false;
+
 if (options.reindex) {
   client.indices.delete({index: index}).then(function() {
       step1();
@@ -50,6 +53,7 @@ function step1() {
     if (!error) {
       lastBlockNumber = response._source.lastBlockNumber;
       lastLogIndex = response._source.lastLogIndex;
+      console.log('Last: ' + lastBlockNumber + ':' + lastLogIndex);
     }
     else {
       lastBlockNumber = 0;
@@ -68,37 +72,13 @@ function step2() {
     if (result.blockNumber == lastBlockNumber && result.logIndex <= lastLogIndex)  {
       return;
     }
-
+    
     console.log(result.blockNumber + ':' + result.logIndex);
 
-    // Delete documents.
     var deletes = callbacks.getDeletes(result);
-    for (type in deletes) {
-      for (id in deletes[type]) {
-        client.delete({
-          index: index,
-          type: type,
-          id: deletes[type][id]
-        }, function (error, response) {
-          console.log(response);
-        });
-      }
-    }
-
-    // Index documents.
     var documents = callbacks.getDocuments(result);
-    for (type in documents) {
-      for (id in documents[type]) {
-        client.index({
-          index: index,
-          type: type,
-          id: id,
-          body: documents[type][id]
-        }, function (error, response) {
-          console.log(response);
-        });
-      }
-    }
+
+    queue.push({deletes: deletes, documents: documents});
 
     client.index({
       index: index,
@@ -109,8 +89,61 @@ function step2() {
         lastLogIndex: result.logIndex
       }
     }, function (error, response) {
-      console.log(response);
+      if (!error) {
+        console.log(response);
+      }
     });
 
+    if (!processing) {
+      processQueue();
+    }
   });
+}
+
+function processQueue() {
+  if (queue.length == 0) {
+    return;
+  }
+  processing = true;
+
+  if (queue[0].hasOwnProperty('deletes')) {
+    for (type in queue[0].deletes) {
+      for (id in queue[0].deletes[type]) {
+        client.delete({
+          index: index,
+          type: type,
+          id: queue[0].deletes[type][id]
+        }, function (error, response) {
+          console.log(response);
+          if (!processing) {
+            processQueue();
+          }
+        });
+      }
+    }
+    delete queue[0].deletes
+  }
+  else {
+    for (type in queue[0].documents) {
+      for (id in queue[0].documents[type]) {
+        client.index({
+          index: index,
+          type: type,
+          id: id,
+          body: queue[0].documents[type][id]
+        }, function (error, response) {
+          if (!error) {
+            console.log(response);
+            if (!processing) {
+              processQueue();
+            }
+          }
+        });
+      }
+    }
+  }
+  
+  queue.shift();
+
+  processing = false;
 }
