@@ -45,22 +45,27 @@ else {
 
 function step1() {
   // Get last log processed.
-  client.get({
-    index: index,
-    type: 'elastic-ethereum',
-    id: 0
+  client.indices.refresh({
+    index: index
   }, function (error, response) {
-    if (!error) {
-      lastBlockNumber = response._source.lastBlockNumber;
-      lastLogIndex = response._source.lastLogIndex;
-      console.log('Last: ' + lastBlockNumber + ':' + lastLogIndex);
-    }
-    else {
-      lastBlockNumber = 0;
-      callbacks.onCreate();
-    }
+    console.log(error);
+    client.get({
+      index: index,
+      type: 'elastic-ethereum',
+      id: 0
+    }, function (error, response) {
+      if (!error) {
+        lastBlockNumber = response._source.lastBlockNumber;
+        lastLogIndex = response._source.lastLogIndex;
+        console.log('Last: ' + lastBlockNumber + ':' + lastLogIndex);
+      }
+      else {
+        lastBlockNumber = 0;
+        callbacks.onCreate();
+      }
 
-    step2();
+      step2();
+    })
   });
 }
 
