@@ -1,10 +1,14 @@
 {
   "ethereum": {
-    "provider": "http://localhost:8545",
-    "contract_address": "0x"
+    "provider": "http://localhost:8545"
   },
   "elasticsearch": {
-    "host": "localhost:9200",
-    "index": ""
+    "host": "localhost:9200"
+  },
+  "contracts" : {
+    "example": {
+      "address": "0x",
+      "index": ""
+    }
   }
 }

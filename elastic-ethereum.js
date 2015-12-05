@@ -2,28 +2,26 @@ var Web3 = require('web3');
 web3 = new Web3();
 var elasticsearch = require('elasticsearch');
 var config = require('config');
-
 var commandLineArgs = require('command-line-args');
 
 var cli = commandLineArgs([
+  { name: 'contract', alias: 'c', type: String, defaultOption: true },
   { name: 'reindex', alias: 'r', type: Boolean }
 ]);
 
 var options = cli.parse();
-
-index = config.get('elasticsearch.index');
+var index = config.contracts[options.contract].index;
 
 web3.setProvider(new web3.providers.HttpProvider(config.get('ethereum.provider')));
 
-
-var abi = require('./config/' + process.env.NODE_ENV + '.abi.json');
+var abi = require('./config/' + options.contract + '.abi.json');
 contract = web3.eth.contract(abi);
 
 client = new elasticsearch.Client({
   host: config.get('elasticsearch.host')
 });
 
-var callbacks = require('./config/' + process.env.NODE_ENV + '.callbacks.js');
+var callbacks = require('./config/' + options.contract + '.callbacks.js');
 callbacks.onInit();
 
 var lastBlockNumber;
@@ -46,7 +44,7 @@ else {
 function step1() {
   // Get last log processed.
   client.indices.refresh({
-    index: index
+    index: config.index
   }, function (error, response) {
     console.log(error);
     client.get({
@@ -70,7 +68,7 @@ function step1() {
 }
 
 function step2() {
-  var filter = web3.eth.filter({fromBlock: lastBlockNumber, toBlock: 'latest', address: config.get('ethereum.contract_address')});
+  var filter = web3.eth.filter({fromBlock: lastBlockNumber, toBlock: 'latest', address: config.contracts[options.contract].address});
 
   filter.watch(function(error, result) {
     // Check if we have indexed this log before.
