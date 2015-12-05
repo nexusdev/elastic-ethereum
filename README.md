@@ -16,7 +16,7 @@ Copy config/template.callbacks.js to config/`contract_key`.callbacks.js and cust
 * getDeletes() is passed each event that is detected and should return a list of index ids to delete.
 * getDocuments() is passed each event that is detected and should return a list of documents that are new or updated.
 
-Run
+##Run
 ```
 export NODE_ENV=production
 node elastic-ethereum.js contract-key
