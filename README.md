@@ -5,7 +5,10 @@ Both and Geth and Elasticsearch need to be running.
 
 In order to configure Elastic Ethereum copy config/default.js to config.production.js and edit the connection configuration if necessary.
 
-For each contract you want to watch you need to add a key to the contracts configuration. The key is just an identifier. The value is an object with two fields. `address` is the address of the Ethereum contract that will have its events watched. `index` is the name of the Elasticsearch index that will be used.
+Each contract you want to index needs to be added to the `contracts` section of the configuration. Each contract has two fields:
+
+* `address` is the address of the Ethereum contract that will have its events watched.
+* `index` is the name of the Elasticsearch index that will be used.
 
 Copy config/template.callbacks.js to config/`contract_key`.callbacks.js and customize the callbacks.
 
