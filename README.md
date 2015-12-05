@@ -17,9 +17,19 @@ Copy config/template.callbacks.js to config/`contract_key`.callbacks.js and cust
 * getDeletes() is passed each event that is detected and should return a list of index ids to delete.
 * getDocuments() is passed each event that is detected and should return a list of documents that are new or updated.
 
-##Run
+## Run
 ```
 export NODE_ENV=production
 node elastic-ethereum.js contract-key
 ```
 
+## Extra contract methods
+Once your contract is being successfully indexed in Elasticsearch, it makes sense to extend the contract object with some extra methods that will query the index.
+
+* Install Elastic Ethereum as a submodule of your node program. `npm install --save elastic-ethereum`
+* elasticEthereum = require('elastic-ethereum');
+* `cp -a elastic-ethereum/config .`
+* Configure config.production.js as above
+* copy config/template.extend-contract.js to config/`contract_key`.extend-contract.js
+* Implement additional methods
+* After you have obtained the contract object from web3, call elasticEthereum.extendContract(`contractKey`, contractObject)
