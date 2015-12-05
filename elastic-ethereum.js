@@ -32,16 +32,16 @@ var processing = false;
 
 if (options.reindex) {
   client.indices.delete({index: index}).then(function() {
-      step1();
+      init();
   }, function() {
       console.log("error");
   });
 }
 else {
-  step1();
+  init();
 }
 
-function step1() {
+function init() {
   // Get last log processed.
   client.indices.refresh({
     index: config.index
@@ -62,12 +62,12 @@ function step1() {
         callbacks.onCreate();
       }
 
-      step2();
+      watch();
     })
   });
 }
 
-function step2() {
+function watch() {
   var filter = web3.eth.filter({fromBlock: lastBlockNumber, toBlock: 'latest', address: config.contracts[options.contract].address});
 
   filter.watch(function(error, result) {
