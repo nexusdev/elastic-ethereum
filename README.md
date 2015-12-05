@@ -3,7 +3,7 @@ Indexes Ethereum contracts with Elasticsearch.
 
 Both and Geth and Elasticsearch need to be running.
 
-In order to configure Elastic Ethereum copy config/default.js to config.production.js and edit the connection configuration if necessary.
+In order to configure Elastic Ethereum copy config/default.js to config/production.js and edit the connection configuration if necessary.
 
 Each contract you want to index needs to be added to the `contracts` section of the configuration. Each contract has two fields:
 
