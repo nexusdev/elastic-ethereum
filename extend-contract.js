@@ -8,5 +8,5 @@ module.exports = function(contractName, contract) {
   });
 
   var extendContract = require('./config/' + contractName + '.extend-contract.js');
-  extendContract.extendContract(contract);
+  extendContract(contract);
 }
