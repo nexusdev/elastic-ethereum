@@ -27,7 +27,7 @@ node elastic-ethereum.js contract-key
 Once your contract is being successfully indexed in Elasticsearch, it makes sense to extend the contract object with some extra methods that will query the index.
 
 * Install Elastic Ethereum as a submodule of your node program. `npm install --save elastic-ethereum`
-* elasticEthereum = require('elastic-ethereum');
+* `elasticEthereum = require('elastic-ethereum');`
 * `cp -a elastic-ethereum/config .`
 * Configure config.production.js as above
 * copy config/template.extend-contract.js to config/`contract_key`.extend-contract.js
