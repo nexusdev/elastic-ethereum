@@ -15,7 +15,7 @@ index = config.contracts[options.contract].index;
 web3.setProvider(new web3.providers.HttpProvider(config.get('ethereum.provider')));
 
 var abi = require('./config/' + options.contract + '.abi.json');
-contract = web3.eth.contract(abi);
+contract = web3.eth.contract(abi).at(config.contracts[options.contract].address);
 
 client = new elasticsearch.Client({
   host: config.get('elasticsearch.host')
