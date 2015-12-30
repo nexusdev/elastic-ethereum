@@ -10,6 +10,8 @@ Each contract you want to index needs to be added to the `contracts` section of 
 * `address` is the address of the Ethereum contract that will have its events watched.
 * `index` is the name of the Elasticsearch index that will be used.
 
+Create config/`contract_key`.abi.json with the JSON ABI from the compiler.
+
 Copy config/template.callbacks.js to config/`contract_key`.callbacks.js and customize the callbacks.
 
 * onInit() is run everytime Elastic Ethereum starts or resumes indexing a contract.
