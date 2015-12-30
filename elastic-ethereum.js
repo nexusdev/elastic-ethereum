@@ -10,7 +10,7 @@ var cli = commandLineArgs([
 ]);
 
 var options = cli.parse();
-var index = config.contracts[options.contract].index;
+index = config.contracts[options.contract].index;
 
 web3.setProvider(new web3.providers.HttpProvider(config.get('ethereum.provider')));
 
