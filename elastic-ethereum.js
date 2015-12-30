@@ -124,9 +124,8 @@ function processQueue() {
         });
       }
     }
-    delete queue[0].deletes
   }
-  else {
+  if (queue[0].hasOwnProperty('documents')) {
     for (type in queue[0].documents) {
       for (id in queue[0].documents[type]) {
         client.index({
